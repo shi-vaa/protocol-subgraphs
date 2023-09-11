@@ -1,4 +1,4 @@
-import { ethereum, Value, Address, log } from '@graphprotocol/graph-ts';
+import { ethereum, Value, Address, log, BigInt } from '@graphprotocol/graph-ts';
 
 import {
   ProxyCreated,
@@ -7,13 +7,14 @@ import {
   PoolConfiguratorUpdated,
   PoolDataProviderUpdated,
   AddressSet,
-} from '../../../generated/templates/PoolAddressesProvider/PoolAddressesProvider';
+} from '../../../generated/PoolAddressesProvider/PoolAddressesProvider';
 import {
   Pool as PoolContract,
   PoolConfigurator as PoolConfiguratorContract,
 } from '../../../generated/templates';
 import { createMapContractToPool, getOrInitPriceOracle } from '../../helpers/v3/initializers';
 import { ContractToPoolMapping, Pool } from '../../../generated/schema';
+import { getProtocol } from '../../helpers/v3/initializers';
 
 let POOL_COMPONENTS = [
   'poolDataProvider',
@@ -25,7 +26,7 @@ let POOL_COMPONENTS = [
   'proxyPriceProvider',
 ] as string[];
 
-function genericAddressProviderUpdate(
+function    genericAddressProviderUpdate(
   component: string,
   newAddress: Address,
   event: ethereum.Event,
@@ -36,9 +37,16 @@ function genericAddressProviderUpdate(
   }
   let poolAddress = event.address.toHexString();
   let pool = Pool.load(poolAddress);
+  let protocol = getProtocol();
   if (pool == null) {
-    log.error('pool {} is not registered!', [poolAddress]);
-    throw new Error('pool' + poolAddress + 'is not registered!');
+    let newPool = new Pool(poolAddress);
+    newPool.protocol = protocol.id;
+    newPool.addressProviderId = new BigInt(1);
+    newPool.active = true;
+    newPool.paused = false;
+    newPool.lastUpdateTimestamp = event.block.timestamp.toI32();
+    newPool.save();
+    pool = newPool;
   }
 
   pool.set(component, Value.fromAddress(newAddress));

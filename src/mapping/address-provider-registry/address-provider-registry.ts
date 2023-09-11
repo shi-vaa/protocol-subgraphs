@@ -1,6 +1,6 @@
 import { Address } from '@graphprotocol/graph-ts';
 import { Pool } from '../../../generated/schema';
-import { LendingPoolAddressesProvider } from '../../../generated/templates';
+// import { LendingPoolAddressesProvider } from '../../../generated/templates';
 import {
   AddressesProviderRegistered,
   AddressesProviderUnregistered,
@@ -18,7 +18,7 @@ export function handleAddressesProviderRegistered(event: AddressesProviderRegist
     pool.lastUpdateTimestamp = event.block.timestamp.toI32();
     pool.save();
 
-    LendingPoolAddressesProvider.create(Address.fromString(address));
+    // LendingPoolAddressesProvider.create(Address.fromString(address));
   }
 }
 

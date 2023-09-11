@@ -1,6 +1,6 @@
 import { Address } from '@graphprotocol/graph-ts';
 import { Pool } from '../../../generated/schema';
-import { PoolAddressesProvider } from '../../../generated/templates';
+// import { PoolAddressesProvider } from '../../../generated/templates';
 import {
   AddressesProviderRegistered,
   AddressesProviderUnregistered,
@@ -19,7 +19,7 @@ export function handleAddressesProviderRegistered(event: AddressesProviderRegist
     pool.lastUpdateTimestamp = event.block.timestamp.toI32();
     pool.save();
 
-    PoolAddressesProvider.create(Address.fromString(address));
+    // PoolAddressesProvider.create(Address.fromString(address));
   }
 }
 
